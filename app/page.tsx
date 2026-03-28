@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Masonry from 'react-masonry-css';
-import { getSydoItems } from './actions';
+import { supabase } from './supabase'; // actions 대신 직접 supabase 연결!
 
 export default function Page() {
   const [allItems, setAllItems] = useState<any[]>([]); 
@@ -12,11 +12,20 @@ export default function Page() {
   const observerTarget = useRef(null);
 
   useEffect(() => {
-    getSydoItems().then((data) => {
-      setAllItems(data);
-      setDisplayItems(data.slice(0, 30)); 
+    async function fetchData() {
+      // 수파베이스에서 직접 데이터 가져오기
+      const { data, error } = await supabase
+        .from('sydo_trends') // 준일님 테이블 이름이 'sydo_trends' 맞죠?
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (data) {
+        setAllItems(data);
+        setDisplayItems(data.slice(0, 30));
+      }
       setLoading(false);
-    });
+    }
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -78,7 +87,6 @@ export default function Page() {
                 />
               </div>
 
-              {/* 호버 정보창 (수정됨) */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 p-5 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 <div className="flex justify-between items-center gap-2">
                   <span className={`px-3 py-1 text-[9px] font-mono font-bold tracking-wider rounded-full border ${badgeColor}`}>
