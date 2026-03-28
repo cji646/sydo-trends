@@ -15,7 +15,7 @@ export default function Page() {
     async function fetchData() {
       // 수파베이스에서 직접 데이터 가져오기
       const { data, error } = await supabase
-        .from('sydo_trends') // 준일님 테이블 이름이 'sydo_trends' 맞죠?
+        .from('sydo_items')
         .select('*')
         .order('id', { ascending: false });
 
